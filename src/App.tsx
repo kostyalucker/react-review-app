@@ -1,54 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+
+import { List } from './components/List';
+
+import { makeRandomString } from './utils';
+import { ITEMS_COUNT } from './constants';
+import { ItemType } from './types';
+
 import logo from './logo.svg';
 import './App.css';
 
-
 function App() {
-    // d - List of items that can be updated with new additional items when the button is pressed
-    var [d, set] = React.useState()
+    let [items, setItems] = React.useState<ItemType[]>([]);
 
-    var fill = () => {
-        // The function fills the list for render with some items
-
-        [...Array(20)].forEach((_, index) => {
-            if (!Array.isArray(d)) {
-                // @ts-ignore
-                d = []
+    function makeItems(): ItemType[] {
+        const result: ItemType[] = [...Array(ITEMS_COUNT)].map(() => {
+            return {
+                id: makeRandomString(), 
+                title: makeRandomString()
             }
+        });
 
-            // @ts-ignore
-            d.push({
-                id: index, title: (function () {
-                    var result = [];
-                    for (var i = 0; i < 10; i++) {
-                        result.push('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() *
-                            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.length)));
-                    }
-                    var string = result.join('');
-                    return string
-                })()
-            })
-        })
-        set(d)
-    }
+        return result;
+    };
 
-    // Fills the List onmount
-    fill()
+    function addItems(): void {
+        const result = [...items, ...makeItems()];
 
-    var render = () => {
-        // renders the list of items as components
+        setItems(result);
+    };
 
-        if (!Array.isArray(d)) {
-            // @ts-ignore
-            d = []
-        }
-        var result:any = []
-        // @ts-ignore
-        d.forEach(function (i, index) {
-            result.push(<div className={'App-item'}>{'Title is:' + i.title + '!'}</div>)
-        })
-        return result
-    }
+    useEffect(() => {
+        setItems(makeItems());
+    }, []);
 
     return (
         <div className="App">
@@ -56,40 +39,11 @@ function App() {
                 <img src={logo} className="App-logo" alt="logo"/>
             </div>
             <div>
-                <button className={"App-button"} onClick={() => {
-                    // The Function adds new items to the existing list
-
-                    if (!Array.isArray(d)) {
-                        // @ts-ignore
-                        d = []
-                    }
-                    [...Array(20)].forEach((_, index) => {
-                        if (!Array.isArray(d)) {
-                            // @ts-ignore
-                            d = []
-                        }
-                        // @ts-ignore
-                        d.push({
-                            id: index, title: (function () {
-                                var result = [];
-                                for (var i = 0; i < 10; i++) {
-                                    result.push('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() *
-                                        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.length)));
-                                }
-                                var string = result.join('');
-                                return string
-                            })()
-                        })
-                    })
-                    // @ts-ignore
-                    set(d)
-                }}>
+                <button className={"App-button"} onClick={addItems}>
                     Add More
-                </button>
+                </button> 
             </div>
-            <div>
-                {render()}
-            </div>
+            <List items={items} />
         </div>
     );
 }
